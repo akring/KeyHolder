@@ -64,6 +64,7 @@ open class RecordView: NSView {
     private let modifierEventHandler = ModifierEventHandler()
     private let validModifiers: [NSEvent.ModifierFlags] = [.shift, .control, .option, .command]
     private let validModifiersText: [NSString] = ["⇧", "⌃", "⌥", "⌘"]
+    fileprivate var validateModifiers: Bool = true
     private var inputModifiers = NSEvent.ModifierFlags()
     private var fontSize: CGFloat {
         return bounds.height / 1.7
@@ -93,7 +94,8 @@ open class RecordView: NSView {
     }
 
     // MARK: - Initialize
-    public override init(frame frameRect: NSRect) {
+    public override init(frame frameRect: NSRect, validateModifiers: Bool = true) {
+        self.validateModifiers = validateModifiers
         super.init(frame: frameRect)
         initView()
     }
@@ -210,17 +212,9 @@ open class RecordView: NSView {
         guard isFirstResponder else { return false }
         guard let key = Sauce.shared.key(for: Int(theEvent.keyCode)) else { return false }
 
-        if theEvent.modifierFlags.carbonModifiers() != 0 {
-            let modifiers = theEvent.modifierFlags.carbonModifiers()
+        let modifiers = theEvent.modifierFlags.carbonModifiers()
+        if modifiers != 0 || !validateModifiers || key.isFunctionKey {
             guard let keyCombo = KeyCombo(key: key, carbonModifiers: modifiers) else { return false }
-            guard delegate?.recordView(self, canRecordKeyCombo: keyCombo) ?? true else { return false }
-            self.keyCombo = keyCombo
-            didChange?(keyCombo)
-            delegate?.recordView(self, didChangeKeyCombo: keyCombo)
-            endRecording()
-            return true
-        } else if key.isFunctionKey {
-            guard let keyCombo = KeyCombo(key: key, cocoaModifiers: []) else { return false }
             guard delegate?.recordView(self, canRecordKeyCombo: keyCombo) ?? true else { return false }
             self.keyCombo = keyCombo
             didChange?(keyCombo)
