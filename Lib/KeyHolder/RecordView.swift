@@ -94,7 +94,7 @@ open class RecordView: NSView {
     }
 
     // MARK: - Initialize
-    public override init(frame frameRect: NSRect, validateModifiers: Bool = true) {
+    public init(frame frameRect: NSRect, validateModifiers: Bool = true) {
         self.validateModifiers = validateModifiers
         super.init(frame: frameRect)
         initView()
