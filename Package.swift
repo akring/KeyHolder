@@ -13,7 +13,7 @@ let package = Package(
             targets: ["KeyHolder"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/akring/Magnet", .upToNextMinor(from: "3.4.1")),
+         .package(url: "https://github.com/akring/Magnet", .branch("feat/longPress")),
     ],
     targets: [
         .target(
